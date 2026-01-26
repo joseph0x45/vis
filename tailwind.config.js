@@ -1,5 +1,10 @@
 module.exports = {
-  content: ["./templates/**/*.html"],
+  content: [
+    "./templates/base.html",
+    "./templates/dashboard.html", 
+    "./templates/history.html",
+    "./templates/login.html"
+  ],
   theme: {
     extend: {},
   },
