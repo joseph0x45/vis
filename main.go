@@ -18,9 +18,6 @@ import (
 	"github.com/joseph0x45/vis/handler"
 )
 
-//go:embed output.css
-var stylesCSS template.CSS
-
 //go:embed chart.js
 var chartJS template.JS
 
@@ -85,13 +82,6 @@ func main() {
 		ReadTimeout:  time.Minute,
 		WriteTimeout: time.Minute,
 	}
-	r.Get("/styles.css", func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "text/css")
-		w.Header().Set("Cache-Control", "no-cache, no-store, must-revalidate")
-		w.Header().Set("Pragma", "no-cache")
-		w.Header().Set("Expires", "0")
-		w.Write([]byte(stylesCSS))
-	})
 	r.Get("/chart.js", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/javascript")
 		w.Write([]byte(chartJS))
