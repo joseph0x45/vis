@@ -10,6 +10,8 @@ github.com/jmoiron/sqlx v1.4.0 h1:1PLqN7S1UYp5t4SrVVnt4nUVNemrDAtxlulVe+Qgm3o=
 github.com/jmoiron/sqlx v1.4.0/go.mod h1:ZrZ7UsYB/weZdl2Bxg6jCRO9c3YHl8r3ahlKmRT4JLY=
 github.com/joseph0x45/goutils v1.0.1 h1:UETRvakVIwp7KF6TWa4z5k+f+81j0KpLPxjT9nYcpww=
 github.com/joseph0x45/goutils v1.0.1/go.mod h1:MZGdjGCUN9VKUPBoj7Qi7vnZ4XzTVMz7alY32az95Wk=
+github.com/joseph0x45/goutils v1.0.2 h1:v0bSYSOAqiltjlU1TxqCT9d6hSd07qWw3BhgntfZc9U=
+github.com/joseph0x45/goutils v1.0.2/go.mod h1:MZGdjGCUN9VKUPBoj7Qi7vnZ4XzTVMz7alY32az95Wk=
 github.com/joseph0x45/sad v1.1.0 h1:icK+eVhtBWo9KiAR5AMGdyr0Egxqbp0nXNa7bzPdMCA=
 github.com/joseph0x45/sad v1.1.0/go.mod h1:KyorAn+2m4iqYTPYD0KU7otsP++1El51QBW/AOgNCJI=
 github.com/lib/pq v1.10.9 h1:YXG7RB+JIjhP29X+OtkiDnYaXQwpS4JEWq7dtCCRUEw=
@@ -18,3 +20,5 @@ github.com/mattn/go-sqlite3 v1.14.22 h1:2gZY6PC6kBnID23Tichd1K+Z0oS6nE/XwU+Vz/5o
 github.com/mattn/go-sqlite3 v1.14.22/go.mod h1:Uh1q+B4BYcTPb+yiD3kU8Ct7aC0hY9fxUwlHK0RXw+Y=
 golang.org/x/crypto v0.46.0 h1:cKRW/pmt1pKAfetfu+RCEvjvZkA9RimPbh7bhFjGVBU=
 golang.org/x/crypto v0.46.0/go.mod h1:Evb/oLKmMraqjZ2iQTwDwvCtJkczlDuTmdJXoZVzqU0=
+golang.org/x/crypto v0.47.0 h1:V6e3FRj+n4dbpw86FJ8Fv7XVOql7TEwpHapKoMJ/GO8=
+golang.org/x/crypto v0.47.0/go.mod h1:ff3Y9VzzKbwSSEzWqJsJVBnWmRwRSHt/6Op5n9bQc4A=

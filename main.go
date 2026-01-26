@@ -44,17 +44,22 @@ func init() {
 var version = "dev"
 
 func main() {
+	goutils.SetAppName("vis")
 	versionFlag := flag.Bool("version", false, "Display the current version")
+	generateServiceFileFlag := flag.Bool("generate-service-file", false, "Generate a service file")
 	flag.Parse()
 	if *versionFlag {
 		fmt.Printf("Vis %s\n", version)
+		return
+	}
+	if *generateServiceFileFlag {
+		goutils.GenerateServiceFile("Vis, self hosted, personal power usage tracker")
 		return
 	}
 	port := os.Getenv("port")
 	if port == "" {
 		port = "8080"
 	}
-	goutils.SetAppName("vis")
 	dbPath := goutils.Setup()
 	conn := db.Connect(sad.DBConnectionOptions{
 		EnableForeignKeys: true,
