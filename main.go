@@ -31,8 +31,12 @@ var templates *template.Template
 func init() {
 	funcMap := template.FuncMap{
 		"formatTime": func(timestamp int64) string {
+			if timestamp == 0 {
+				return ""
+			}
 			t := time.Unix(timestamp, 0)
-			return t.Format("3:04 PM")
+			formatted := t.Format("3:04 PM")
+			return "at " + formatted
 		},
 	}
 	templates = template.Must(template.New("").Funcs(funcMap).ParseFS(

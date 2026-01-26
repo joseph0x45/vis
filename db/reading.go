@@ -1,6 +1,8 @@
 package db
 
 import (
+	"database/sql"
+	"errors"
 	"fmt"
 
 	"github.com/joseph0x45/vis/models"
@@ -44,6 +46,9 @@ func (c *Conn) GetLatestReading() (*models.Reading, error) {
 	reading := &models.Reading{}
 	const query = "select * from readings order by timestamp desc limit 1"
 	if err := c.db.Get(reading, query); err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, nil
+		}
 		return nil, fmt.Errorf("Error while getting latest reading: %w", err)
 	}
 	return reading, nil

@@ -50,6 +50,11 @@ func (h *Handler) renderDashboard(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+	if latestReading == nil {
+		latestReading = &models.Reading{
+			DateString: "No Data yet",
+		}
+	}
 	readings, err := h.conn.GetReadings(true)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)

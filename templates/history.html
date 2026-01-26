@@ -24,7 +24,7 @@
         <tbody class="bg-white divide-y divide-gray-200">
           {{range .Purchases}}
           <tr class="hover:bg-gray-50">
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{.DateString}} at {{formatTime .Timestamp}}
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{.DateString}} {{formatTime .Timestamp}}
             </td>
             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{.Kwh}} kWh</td>
             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{.Cost}}</td>
@@ -56,7 +56,7 @@
         <tbody class="bg-white divide-y divide-gray-200">
           {{range .Readings}}
           <tr class="hover:bg-gray-50">
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{.DateString}} at {{formatTime .Timestamp}}
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{.DateString}} {{formatTime .Timestamp}}
             </td>
             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{.Kwh}} kWh</td>
           </tr>
