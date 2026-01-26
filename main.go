@@ -38,7 +38,7 @@ func main() {
 	if port == "" {
 		port = "8080"
 	}
-	goutils.SetAppName("beacon")
+	goutils.SetAppName("vis")
 	dbPath := goutils.Setup()
 	conn := db.Connect(sad.DBConnectionOptions{
 		EnableForeignKeys: true,
