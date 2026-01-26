@@ -56,7 +56,7 @@ func main() {
 		goutils.GenerateServiceFile("Vis, self hosted, personal power usage tracker")
 		return
 	}
-	port := os.Getenv("port")
+	port := os.Getenv("PORT")
 	if port == "" {
 		port = "8080"
 	}
@@ -82,7 +82,7 @@ func main() {
 		w.Write([]byte(chartJS))
 	})
 	handler.RegisterRoutes(r)
-	log.Printf("Starting server on  http://localhost:%s", port)
+	log.Printf("Starting server on  http://0.0.0.0:%s", port)
 	if err := server.ListenAndServe(); err != nil {
 		panic(err)
 	}
