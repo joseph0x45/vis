@@ -2,6 +2,7 @@ package handler
 
 import (
 	"bytes"
+	"fmt"
 	"html/template"
 	"log"
 	"net/http"
@@ -10,6 +11,7 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/google/uuid"
+	"github.com/joseph0x45/goutils"
 	"github.com/joseph0x45/vis/db"
 	"github.com/joseph0x45/vis/models"
 )
@@ -17,15 +19,18 @@ import (
 type Handler struct {
 	templates *template.Template
 	conn      *db.Conn
+	version   string
 }
 
 func NewHandler(
 	templates *template.Template,
 	conn *db.Conn,
+	version string,
 ) *Handler {
 	return &Handler{
 		templates: templates,
 		conn:      conn,
+		version:   version,
 	}
 }
 
@@ -173,9 +178,87 @@ func (h *Handler) renderHistory(w http.ResponseWriter, r *http.Request) {
 	w.Write(responseBuffer.Bytes())
 }
 
+func (h *Handler) renderLoginPage(w http.ResponseWriter, r *http.Request) {
+	var responseBuffer bytes.Buffer
+	if err := h.templates.ExecuteTemplate(&responseBuffer, "login", nil); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	w.WriteHeader(http.StatusOK)
+	w.Write(responseBuffer.Bytes())
+}
+
+func (h *Handler) login(w http.ResponseWriter, r *http.Request) {
+	if err := r.ParseForm(); err != nil {
+		h.templates.ExecuteTemplate(w, "login", map[string]any{
+			"Error": "Something went wrong! Try again",
+		})
+		return
+	}
+	username := r.FormValue("username")
+	password := r.FormValue("password")
+	user, err := h.conn.GetUserBy("username", username)
+	if err != nil {
+		h.templates.ExecuteTemplate(w, "login", map[string]any{
+			"Error": "Something went wrong! Try again",
+		})
+		return
+	}
+	if user == nil {
+		h.templates.ExecuteTemplate(w, "login", map[string]any{
+			"Error": fmt.Sprintf("User %s not found", username),
+		})
+		return
+	}
+	if !goutils.HashMatchesPassword(user.Password, password) {
+		h.templates.ExecuteTemplate(w, "login", map[string]any{
+			"Error": "Invalid credentials",
+		})
+		return
+	}
+	cookie := &http.Cookie{
+		Name:     "user",
+		Value:    user.ID,
+		Path:     "/",
+		HttpOnly: true,
+		Secure:   h.version != "dev",
+		SameSite: http.SameSiteStrictMode,
+		Expires:  time.Now().Add(100 * 365 * 24 * time.Hour),
+	}
+	http.SetCookie(w, cookie)
+	http.Redirect(w, r, "/", http.StatusSeeOther)
+}
+
+func (h *Handler) authRequired(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		cookie, err := r.Cookie("user")
+		if err != nil {
+			log.Println("Failed to get cookie:", err.Error())
+			http.Redirect(w, r, "/login", http.StatusSeeOther)
+			return
+		}
+		user, err := h.conn.GetUserBy("id", cookie.Value)
+		if err != nil {
+			log.Println(err.Error())
+			http.Redirect(w, r, "/login", http.StatusSeeOther)
+			return
+		}
+		if user == nil {
+			http.Redirect(w, r, "/login", http.StatusSeeOther)
+			return
+		}
+		next.ServeHTTP(w, r)
+	})
+}
+
 func (h *Handler) RegisterRoutes(r chi.Router) {
-	r.Get("/", h.renderDashboard)
-	r.Get("/history", h.renderHistory)
-	r.Post("/readings", h.recordReading)
-	r.Post("/purchases", h.logPurchase)
+	r.Get("/login", h.renderLoginPage)
+	r.Post("/login", h.login)
+	r.Group(func(r chi.Router) {
+		r.Use(h.authRequired)
+		r.Get("/", h.renderDashboard)
+		r.Get("/history", h.renderHistory)
+		r.Post("/readings", h.recordReading)
+		r.Post("/purchases", h.logPurchase)
+	})
 }

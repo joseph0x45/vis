@@ -25,3 +25,9 @@ type Purchase struct {
 	DateString string  `db:"date_str"`
 	TimeString string
 }
+
+type User struct {
+	ID       string `db:"id"`
+	Username string `db:"username"`
+	Password string `db:"password"`
+}

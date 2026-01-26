@@ -28,4 +28,15 @@ var migrations = []sad.Migration{
       );
     `,
 	},
+	{
+		Version: 3,
+		Name:    "create_users",
+		SQL: `
+      create table users (
+        id text not null primary key,
+        username text not null unique,
+        password text not null
+      );
+    `,
+	},
 }

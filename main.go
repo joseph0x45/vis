@@ -13,6 +13,7 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/joseph0x45/goutils"
 	"github.com/joseph0x45/sad"
+	"github.com/joseph0x45/vis/cli"
 	"github.com/joseph0x45/vis/db"
 	"github.com/joseph0x45/vis/handler"
 )
@@ -51,6 +52,9 @@ func main() {
 	goutils.SetAppName("vis")
 	versionFlag := flag.Bool("version", false, "Display the current version")
 	generateServiceFileFlag := flag.Bool("generate-service-file", false, "Generate a service file")
+	createUserFlag := flag.Bool("create-user", false, "Create a new user")
+	usernameFlag := flag.String("username", "", "The user's username")
+	passwordFlag := flag.String("password", "", "The user's password")
 	flag.Parse()
 	if *versionFlag {
 		fmt.Printf("Vis %s\n", version)
@@ -60,17 +64,21 @@ func main() {
 		goutils.GenerateServiceFile("Vis, self hosted, personal power usage tracker")
 		return
 	}
-	port := os.Getenv("PORT")
-	if port == "" {
-		port = "8080"
-	}
 	dbPath := goutils.Setup()
 	conn := db.Connect(sad.DBConnectionOptions{
 		EnableForeignKeys: true,
 		DatabasePath:      dbPath,
 	})
+	if *createUserFlag {
+		cli.CreateUser(*usernameFlag, *passwordFlag, conn)
+		return
+	}
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8080"
+	}
 	r := chi.NewRouter()
-	handler := handler.NewHandler(templates, conn)
+	handler := handler.NewHandler(templates, conn, version)
 	server := http.Server{
 		Addr:         ":" + port,
 		Handler:      r,
