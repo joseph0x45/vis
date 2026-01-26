@@ -3,9 +3,11 @@ package models
 import "html/template"
 
 type PageData struct {
+	ChartData   map[string]any
 	Content     template.HTML
-	CurrentKWh  int
+	CurrentKWh  float64
 	LastUpdated string
+	Timestamp   int64
 }
 
 type Reading struct {
@@ -21,4 +23,5 @@ type Purchase struct {
 	Kwh        float64 `db:"kwh"`
 	Cost       int     `db:"cost"`
 	DateString string  `db:"date_str"`
+	TimeString string
 }

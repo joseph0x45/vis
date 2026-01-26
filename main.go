@@ -27,7 +27,13 @@ var templatesFS embed.FS
 var templates *template.Template
 
 func init() {
-	templates = template.Must(template.ParseFS(
+	funcMap := template.FuncMap{
+		"formatTime": func(timestamp int64) string {
+			t := time.Unix(timestamp, 0)
+			return t.Format("3:04 PM")
+		},
+	}
+	templates = template.Must(template.New("").Funcs(funcMap).ParseFS(
 		templatesFS,
 		"templates/*.html",
 	))

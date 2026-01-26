@@ -24,6 +24,27 @@ func (c *Conn) InsertReading(reading *models.Reading) error {
 	return nil
 }
 
-func (c *Conn) GetReadings() ([]models.Reading, error) {
-	return nil, nil
+func (c *Conn) GetReadings(filterForDashboard bool) ([]models.Reading, error) {
+	const query = "select * from readings order by timestamp desc"
+	const dashboardQuery = "select * from readings order by timestamp asc"
+	readings := []models.Reading{}
+	var err error
+	if filterForDashboard {
+		err = c.db.Select(&readings, dashboardQuery)
+	} else {
+		err = c.db.Select(&readings, query)
+	}
+	if err != nil {
+		return nil, fmt.Errorf("Error while getting readings: %w", err)
+	}
+	return readings, nil
+}
+
+func (c *Conn) GetLatestReading() (*models.Reading, error) {
+	reading := &models.Reading{}
+	const query = "select * from readings order by timestamp desc limit 1"
+	if err := c.db.Get(reading, query); err != nil {
+		return nil, fmt.Errorf("Error while getting latest reading: %w", err)
+	}
+	return reading, nil
 }

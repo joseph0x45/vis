@@ -29,11 +29,39 @@ func NewHandler(
 	}
 }
 
+func makeChartData(readings []models.Reading) map[string]any {
+	labels := make([]string, len(readings))
+	values := make([]float64, len(readings))
+
+	for i, reading := range readings {
+		labels[i] = reading.DateString
+		values[i] = reading.Kwh
+	}
+	chartData := map[string]any{
+		"labels": labels,
+		"values": values,
+	}
+	return chartData
+}
+
 func (h *Handler) renderDashboard(w http.ResponseWriter, r *http.Request) {
+	latestReading, err := h.conn.GetLatestReading()
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	readings, err := h.conn.GetReadings(true)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	chartData := makeChartData(readings)
 	var contentBuffer bytes.Buffer
 	pageData := models.PageData{
-		LastUpdated: "Yesterday",
-		CurrentKWh:  143,
+		ChartData:   chartData,
+		LastUpdated: latestReading.DateString,
+		CurrentKWh:  latestReading.Kwh,
+		Timestamp:   latestReading.Timestamp,
 	}
 	if err := h.templates.ExecuteTemplate(&contentBuffer, "dashboard", pageData); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -67,7 +95,7 @@ func (h *Handler) recordReading(w http.ResponseWriter, r *http.Request) {
 		ID:         uuid.NewString(),
 		Timestamp:  now.Unix(),
 		Kwh:        kwh,
-		DateString: now.Format("02-01-2006"),
+		DateString: now.Format("January 2, 2006"),
 	}
 	if err := h.conn.InsertReading(reading); err != nil {
 		log.Println(errMsg + err.Error())
@@ -100,7 +128,7 @@ func (h *Handler) logPurchase(w http.ResponseWriter, r *http.Request) {
 		Timestamp:  now.Unix(),
 		Kwh:        kwh,
 		Cost:       cost,
-		DateString: now.Format("02-01-2006"),
+		DateString: now.Format("January 2, 2006"),
 	}
 	if err := h.conn.InsertPurchase(purchase); err != nil {
 		log.Println(errMsg + err.Error())
@@ -108,8 +136,41 @@ func (h *Handler) logPurchase(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
 
+func (h *Handler) renderHistory(w http.ResponseWriter, r *http.Request) {
+	var err error
+	var readings []models.Reading
+	var purchases []models.Purchase
+	if readings, err = h.conn.GetReadings(false); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	if purchases, err = h.conn.GetPurchases(); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	var contentBuffer bytes.Buffer
+	if err = h.templates.ExecuteTemplate(&contentBuffer, "history", map[string]any{
+		"Readings":  readings,
+		"Purchases": purchases,
+	}); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	var responseBuffer bytes.Buffer
+	pageData := models.PageData{
+		Content: template.HTML(contentBuffer.String()),
+	}
+	if err = h.templates.ExecuteTemplate(&responseBuffer, "base", pageData); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	w.WriteHeader(http.StatusOK)
+	w.Write(responseBuffer.Bytes())
+}
+
 func (h *Handler) RegisterRoutes(r chi.Router) {
 	r.Get("/", h.renderDashboard)
+	r.Get("/history", h.renderHistory)
 	r.Post("/readings", h.recordReading)
 	r.Post("/purchases", h.logPurchase)
 }

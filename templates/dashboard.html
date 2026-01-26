@@ -10,7 +10,7 @@
   <div class="bg-white rounded-lg shadow-md p-6 border border-gray-200">
     <div class="flex items-center justify-between mb-4">
       <h3 class="text-lg font-semibold text-gray-900">Current Status</h3>
-      <span class="text-sm text-gray-500">Last updated: {{.LastUpdated}}</span>
+      <span class="text-sm text-gray-500">Last updated: {{.LastUpdated}} at {{formatTime .Timestamp}}</span>
     </div>
     <div class="flex items-baseline space-x-2">
       <span class="text-5xl font-bold text-blue-600">{{.CurrentKWh}}</span>
@@ -74,10 +74,7 @@
   // Chart.js configuration
   const ctx = document.getElementById('consumptionChart').getContext('2d');
 
-  const chartData = {
-    labels: ['Jan 20', 'Jan 21', 'Jan 22', 'Jan 23', 'Jan 24', 'Jan 25', 'Jan 26'],
-    values: [200, 175, 150, 128, 105, 82, 143]
-  };
+  const chartData = {{.ChartData}};
 
   new Chart(ctx, {
     type: 'line',
