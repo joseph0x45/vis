@@ -2,6 +2,8 @@ package main
 
 import (
 	"embed"
+	"flag"
+	"fmt"
 	"html/template"
 	"log"
 	"net/http"
@@ -39,7 +41,15 @@ func init() {
 	))
 }
 
+var version = "dev"
+
 func main() {
+	versionFlag := flag.Bool("version", false, "Display the current version")
+	flag.Parse()
+	if *versionFlag {
+		fmt.Printf("Vis %s\n", version)
+		return
+	}
 	port := os.Getenv("port")
 	if port == "" {
 		port = "8080"
